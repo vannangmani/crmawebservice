@@ -1,10 +1,14 @@
 package com.rest;
 
-public class Success {
+import javax.xml.bind.annotation.*;
 
+@XmlRootElement(name = "response")
+public class Success {
+	
 	private String success;
 	private String failure;
 
+	@XmlElement
 	public String getFailure() {
 		return failure;
 	}
@@ -13,6 +17,7 @@ public class Success {
 		this.failure = failure;
 	}
 
+	@XmlElement
 	public String getSuccess() {
 		return success;
 	}

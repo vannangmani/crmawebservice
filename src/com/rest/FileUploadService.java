@@ -15,20 +15,24 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 @Path("/files")
 public class FileUploadService {
  	@POST
 	@Path("/upload")
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
- 	@Produces(MediaType.APPLICATION_JSON)
+ 	//@Produces("application/json")
+ 	//@Produces("plain/text")
  	public Response uploadFile(
  			@FormDataParam("file") InputStream uploadedInputStream,
- 			@FormDataParam("file") FormDataContentDisposition fileDetail) {
- 			Success s = new Success();
+ 			@FormDataParam("file") FormDataContentDisposition fileDetail) throws JSONException {
+ 			//Success s = new Success();
+ 			//JSONObject response = new JSONObject();
  			String output="";
- 			String fileLocation = "E:\\Absyz_Workspace\\crmawebservice\\storage\\" + fileDetail.getFileName();
- 			//String fileLocation = "/app/apache-tomcat-7.0.78/webapps/crmawebservice/storage/" + fileDetail.getFileName();
+ 			//String fileLocation = "E:\\Absyz_Workspace\\crmawebservice\\storage\\" + fileDetail.getFileName();
+ 			String fileLocation = "/app/apache-tomcat-7.0.78/webapps/crmawebservice/storage/" + fileDetail.getFileName();
  	      //saving file
  			try {
  				
@@ -43,18 +47,22 @@ public class FileUploadService {
  				out.flush();
  				out.close();
  				//output = "File successfully uploaded to : " + fileLocation;
- 				s.setSuccess("success");
+ 				output = "success";
+ 				//s.setSuccess("success");
+ 				//response.put("response", "success");
  			 	 
  	 			
  			} catch (IOException e) {
  				
  				e.printStackTrace();
  				//output = "File Upload Failure : " + fileLocation;
- 				s.setFailure("failure");
- 				}
+ 				output = "failure";
+ 				//response.put("response", "failure");
+ 				//s.setFailure("failure");
+ 				} 
  			
- 			//return Response.status(200).entity(output).build();
+ 			return Response.status(200).entity(output).build();
  			
- 			return Response.status(200).entity(s).build();
+ 			//return Response.status(200).entity(response(s.toString())).build();
  		}
   }
