@@ -49,7 +49,6 @@ public class FTPConnection {
  	public boolean uploadFile(FTPClient ftp,String strSource, String strDestination,String strRecordId){
  		try {
 			File file = new File(strSource+strRecordId);
-			//String secondRemoteFile = "/salesforce_subfolder/Wildlife.wmv";
 			FileInputStream inputStream = new FileInputStream(file);
 
 			System.out.println("FTP Upload Started...");
@@ -90,5 +89,19 @@ public class FTPConnection {
                 // do nothing as file is already downloaded from FTP server
             }
         }
+    }
+    
+/** This function is used to delete the file from FTP Server **/
+    public boolean deletefile(FTPClient ftp,String strSource, String strRecordId)
+    {
+    	boolean deleteFile=false;
+    	try {
+			deleteFile = ftp.deleteFile(strSource+strRecordId);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			deleteFile=false;
+		}
+    	return deleteFile;
     }
 }

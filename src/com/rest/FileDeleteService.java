@@ -1,4 +1,4 @@
-/** This Class is developed to download the file from App server or from FTP server based on the availability **/
+/** This Class is developed to delete the file from App server or from FTP server based on the availability **/
 package com.rest;
 
 import java.io.File;
@@ -22,7 +22,7 @@ import org.apache.commons.net.ftp.FTPReply;
 
 /** Setting up the REST API Path **/
 @Path("/files")
-public class FileDownloadService {
+public class FileDeleteService {
 	FTPClient ftp= null;
 	public String str_recordId = "";
 	FTPConnection f = new FTPConnection();
@@ -31,65 +31,60 @@ public class FileDownloadService {
 	@GET 
 	
 /** Setting up REST API Path for Upload Service **/
-    @Path("/download")  
+    @Path("/delete")  
    
 /** Setting up data return format. If File is available then it returns the file otherwise it returns failure message   **/ 	
     @Produces({MediaType.APPLICATION_OCTET_STREAM,MediaType.TEXT_PLAIN })
 	
 /** Function for Download the file and returns the file if it is available or returns failure message to client app **/
 /** QueryParam with annotation is used to decide the parameters that should be received as Request **/
-    public Response getFile(@QueryParam("filename") String strFilename,@QueryParam("recordid") String strRecordId)  {
+    public Response getFile(@QueryParam("recordid") String strRecordId)  {
     	
     	ResponseBuilder response = null;
     	String output="";
+    	boolean bDeleteFile;
 		try {
-			System.out.println("Filename is : "+strFilename);
 			System.out.println("Record Id : "+strRecordId);
 			File file = new File(FileConstants.strSource+strRecordId);
 
 /** Checking for the file availability in App server **/
 			if(file.exists() && !file.isDirectory()) 
 			{ 
-				System.out.println("File Available in App server itself");
-			    response = Response.ok((Object) file);  
-				response.header("Content-Disposition","attachment; filename=\"" + strFilename + "\"");
-				return response.build();
+				System.out.println("File Available in App server");
+				bDeleteFile = file.delete();
+				output = FileConstants.strSuccess;
+				System.out.println("File Deleted from App Server : "+strRecordId);
 			}
 			else
 			{
+				System.out.println("File Not available in App server : "+strRecordId);
+			}
 /** Initiating the FTP Connection **/
-				System.out.println("Initiating FTP Connection");
-				ftp = f.ftpConnect(FileConstants.strFTPHost,FileConstants.strUsername,FileConstants.strPassword);
+			System.out.println("Initiating FTP Connection");
+			ftp = f.ftpConnect(FileConstants.strFTPHost,FileConstants.strUsername,FileConstants.strPassword);
+			if(ftp != null)
+			{
 				
-				if(ftp != null)
-				{
-					
-/** Initiating the file transfer from FTP to App server **/
-					f.downloadFile(FileConstants.strFtpSource+strRecordId, FileConstants.strSource+strRecordId,ftp);
-		            System.out.println("FTP File downloaded to App server successfully");
-		            
+/** Initiating to delete the file from FTP server **/
+				bDeleteFile = f.deletefile(ftp,FileConstants.strFtpSource, strRecordId);
+	            	            
 /** Initiating disconnecting FTP server **/
-		            f.disconnect(ftp);
-		           
-/** Initiating the File Download from App server to Client **/
-		            if(file.exists() && !file.isDirectory()) 
-					{ 
-					    response = Response.ok((Object) file);  
-						response.header("Content-Disposition","attachment; filename=\"" + strFilename + "\"");
-						System.out.println("File Downloaded successfully");
-						return response.build();
-					}
-		            else
-					{
-						output = FileConstants.strFailure;
-						return Response.status(200).entity(output).build();
-					}
-				}
-				else
-				{
-					output = FileConstants.strFailure;
-					return Response.status(200).entity(output).build();
-				}
+	            f.disconnect(ftp);	
+	            if(bDeleteFile)
+	            {
+	            	output = FileConstants.strSuccess;
+	            	System.out.println("Successfully Deleted the file from FTP Server : "+strRecordId);
+	            }
+	            else
+	            {
+	            	output = FileConstants.strFailure;
+	            	System.out.println("File not deleted from FTP Server or not available : "+strRecordId);
+	            } 
+			}
+			else
+			{
+				output = FileConstants.strFailure;
+				return Response.status(200).entity(output).build();
 			}
 		}
 		catch (NullPointerException e)
@@ -104,6 +99,7 @@ public class FileDownloadService {
 			output = FileConstants.strFailure;
 			return Response.status(200).entity(output).build();
 		}
+		return Response.status(200).entity(output).build();
 		
      }
 }

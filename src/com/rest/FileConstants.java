@@ -13,5 +13,7 @@ public class FileConstants {
 	public static String strFTPPort = "21";
 	public static String strUsername = "salesforce@absyz.com";
 	public static String strPassword = "Absyz@2017";
+	public static String strSuccess = "success";
+	public static String strFailure = "failure";
 
 }

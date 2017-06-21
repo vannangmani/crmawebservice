@@ -81,10 +81,10 @@ public class FileUploadService extends Thread{
  				
  				thread.start();
  				System.out.println("Thread Started");
- 				output = "success";
+ 				output = FileConstants.strSuccess;
  			} catch (IOException e) {
   				e.printStackTrace();
- 				output = "failure";
+ 				output = FileConstants.strFailure;
  				} 
  			System.out.println("Sending Response");
  			return Response.status(200).entity(output).build();
